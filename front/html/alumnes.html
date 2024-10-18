@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Llista d'alumnes</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="../css/styles.css">
+    <script src="../js/script.js"></script>
 </head>
 <body>
     <div class="container">
@@ -12,12 +13,11 @@
         <table id="tablaAlumne" class="tabla-alumne">
             <thead>
                 <tr>
-                    <th>IdAlumne</th>
-                    <th>IdAula</th>
-                    <th>Nom de l'alumne</th>
-                    <th>Cicle</th>
-                    <th>Curs</th>
+                    <th>Nombre Del Alumno</th>
+                    <th>Ciclo</th>
+                    <th>Curso</th>
                     <th>Grupo</th>
+                    <th>Nombre Del Aula</th>
                 </tr>
             </thead>
             <tbody>
@@ -25,8 +25,7 @@
             </tbody>
         </table>
         <button class="back-button" onclick="window.history.back()">Tornar</button>
+        
     </div>
-
-    <script src="script.js"></script> <!-- Script para cargar los alumnos -->
 </body>
 </html>
