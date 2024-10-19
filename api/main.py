@@ -13,6 +13,7 @@ app.add_middleware(
 )
 
 app.include_router(items.router)
+
 @app.get("/")
 def read_root():
     return {"Alumnes API"}

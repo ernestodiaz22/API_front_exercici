@@ -8,19 +8,9 @@ from routers import alumnes
 
 from internal import db_alumnes
 
-from datetime import datetime
+from fastapi import FastAPI, File, UploadFile
 
 router = APIRouter()
-
-class alumne(BaseModel):
-    idAlumne: int
-    idAula: int
-    nomAlumne: str
-    cicle: str
-    curs: int
-    grup: str
-    createdAt:datetime
-    updatedAt:datetime
 
 class tablaAlumne(BaseModel):
     nomAlumne: str
@@ -28,58 +18,30 @@ class tablaAlumne(BaseModel):
     curs: int
     grup: str
     descAula: str
+    
+@router.post("/alumne/loadAlumnes")
+async def loadAlumnes(file: UploadFile):
+    contents = await file.read()
+    inserts = contents.decode('utf-8').splitlines()#utilizamos decode para decodificar de byte a String y separamos por líneas el documento csv
+    aulasInsertadas = []
+    for insert in inserts:#recorremos los inserts
+         alumno = insert.split(",") #cogemos los datos de los alumnos de cada insert
+         descAula = alumno[0] 
+         edifici = alumno[1]
+         pis = int(alumno[2])
+         nomAlumne = alumno[3] 
+         cicle = alumno[4]
+         curs = int(alumno[5])
+         grup = alumno[6]
+         db_alumnes.addAula(descAula, edifici,pis) #insert con comprobación dde aula
+         db_alumnes.addAlumno(nomAlumne,cicle,curs,grup,descAula) #insert con comprobación de alumno
+    return {"aula": aulasInsertadas}
 
 @router.get("/alumne/list", response_model=List[tablaAlumne])
-def read_alumnes():
-    return alumnes.alumnes_schema(db_alumnes.read())
+async def read_alumnes(orderby: str | None = None,  contain: str | None = None, skip: int = 0, limit: int | None = None):
+    return alumnes.alumnes_schema(db_alumnes.read(orderby , contain, limit, skip))#read según que parámetros sean none o no none
 
-@router.get("/alumne/listAll")
-def read_alumnesAula():
-    return alumnes.alumnesAulas_schema(db_alumnes.read_all())
 
-@router.get("/alumne/show/{id}", response_model=alumne)
-def read_alumne_id(id:int):
-    if db_alumnes.read_id(id) is not None:
-        alumne = alumnes.alumne_schema(db_alumnes.read_id(id))
-    else:
-        raise HTTPException(status_code=404, detail="Item not found")
-    return alumne
-
-@router.post("/alumne/add")
-async def create_alumne(data:alumne):
-        idAula = data.idAula
-        nomAlumne = data.nomAlumne
-        cicle = data.cicle
-        curs = data.curs
-        grup = data.grup
-        query = db_alumnes.create(idAula,nomAlumne, cicle,curs,grup)
-        if query["status"] == -1:
-             return{"message": query["message"]}
-        return {
-            "msg": "S’ha afegit correctement"
-        }
-@router.put("/alumne/update/{id}")
-async def update_alumne(data:alumne, id:int):
-        idAula = data.idAula
-        nomAlumne = data.nomAlumne
-        cicle = data.cicle
-        curs = int(data.curs)
-        grup = data.grup
-        query = db_alumnes.update_alumne(idAula,id,nomAlumne,cicle,curs,grup)
-        if query["status"] == -1:
-             return{"message": query["message"]}
-        return {
-            "msg": "S’ha modificat correctement",
-        }
-
-@router.post("/alumne/delete/{id}")
-def delete_alumne(id:int):
-    deleted_records = db_alumnes.delete_alumne(id)
-    if deleted_records == 0:
-       raise HTTPException(status_code=404, detail="Items to delete not found") 
-    return {
-        "msg": "S’ha modificat correctement",
-    }
 
          
     
