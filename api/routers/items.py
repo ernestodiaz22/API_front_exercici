@@ -23,7 +23,8 @@ class tablaAlumne(BaseModel):
 async def loadAlumnes(file: UploadFile):
     contents = await file.read()
     inserts = contents.decode('utf-8').splitlines()#utilizamos decode para decodificar de byte a String y separamos por líneas el documento csv
-    aulasInsertadas = []
+    insertsAula = 0
+    insertsAlumno = 0
     for insert in inserts:#recorremos los inserts
          alumno = insert.split(",") #cogemos los datos de los alumnos de cada insert
          descAula = alumno[0] 
@@ -33,9 +34,15 @@ async def loadAlumnes(file: UploadFile):
          cicle = alumno[4]
          curs = int(alumno[5])
          grup = alumno[6]
-         db_alumnes.addAula(descAula, edifici,pis) #insert con comprobación dde aula
-         db_alumnes.addAlumno(nomAlumne,cicle,curs,grup,descAula) #insert con comprobación de alumno
-    return {"aula": aulasInsertadas}
+         resultado= db_alumnes.addAula(descAula, edifici, pis)
+         if resultado["status"] == 1:
+            insertsAula += 1 
+        
+        # Inserta alumno y aumenta el contador solo si el alumno fue insertado
+         resultado = db_alumnes.addAlumno(nomAlumne, cicle, curs, grup, descAula)
+         if resultado["status"] == 1:
+            insertsAlumno += 1
+    return {"Inserts aula": insertsAula, "Inserts alumno" : insertsAlumno}
 
 @router.get("/alumne/list", response_model=List[tablaAlumne])
 async def read_alumnes(orderby: str | None = None,  contain: str | None = None, skip: int = 0, limit: int | None = None):

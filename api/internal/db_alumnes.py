@@ -38,12 +38,13 @@ def addAula(descAula, edifici, pis):
             values=(descAula, edifici, pis)
             cur.execute(query,values)
             conn.commit()
+            return {"status": 1}
             
     except Exception as e:
         return {"status": -1, "message": f"Error de connexió:{e}" }
     finally:
         conn.close()
-    return {"status": 1}
+    return {"status": 0}
 
 #AÑADIR ALUMNOS
 def addAlumno(nomAlumne,cicle,curs,grup,descAula):
@@ -64,12 +65,12 @@ def addAlumno(nomAlumne,cicle,curs,grup,descAula):
             values = (idAula,nomAlumne,cicle,curs,grup)
             cur.execute(query, values)
             conn.commit()
-            idAlumno = cur.lastrowid#id del aula
+            return {"status": 1}
     except Exception as e:
         return {"status": -1, "message": f"Error de connexió:{e}" }
     finally:
         conn.close()
-    return {"status": 1}
+    return {"status": 0}
 
 
 
